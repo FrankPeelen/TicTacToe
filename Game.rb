@@ -13,17 +13,17 @@ class Game
 	private
 	# Itterates through one or more games of TicTacToe
 	def play
-		player1 = Player.new(player_name(1), 'X')
-		player2 = Player.new(player_name(2), 'O')
-		board = Board.new
-		until board.winner
-			player_move(board, player1)
-			break if board.winner
-			player_move(board, player2)
-		end
-		puts "Congratulations, #{ board.winner.name }!! You have won!!"
-		puts "The result is as follows:"
-		board.status
+			player1 = Player.new(player_name(1), 'X')
+			player2 = Player.new(player_name(2), 'O')
+			board = Board.new
+			until board.winner
+				player_move(board, player1)
+				break if board.winner
+				player_move(board, player2)
+			end
+			puts "Congratulations, #{ board.winner.name }!! You have won!!"
+			puts "The result is as follows:"
+			board.status
 	end
 
 	private

@@ -93,16 +93,8 @@ class Board
 	#
 	# * +Player+ - Returns nil, unless a player occupies an entire row, then returns that player.
 	def scan_hor(proc)
-		dim_loop { |p|
-			has_winner = true
-			winner = proc.call(p * @dimension)
-			1.upto(@dimension - 1) do |q|
-				index = p * @dimension + q
-				has_winner = false unless winner == proc.call(index)
-			end
-			return winner if has_winner && winner != nil
-		}
-		nil
+		left_to_right = Proc.new { |p| p * @dimension }
+		scan_helper(proc, left_to_right) { |p, q| p * @dimension + q }
 	end
 
 	# Loops through the vertical columns of the board.
@@ -115,19 +107,11 @@ class Board
 	#
 	# * +Player+ - Returns nil, unless a player occupies an entire column, then returns that player.
 	def scan_ver(proc)
-		dim_loop { |p|
-			has_winner = true
-			winner = proc.call(p)
-			1.upto(@dimension - 1) do |q|
-				index = q * @dimension + p
-				has_winner = false unless winner == proc.call(index)
-			end
-			return winner if has_winner && winner != nil
-		}
-		nil
+		top_to_bottom = Proc.new { |p| p}
+		scan_helper(proc, top_to_bottom) { |p, q| q * @dimension + p }
 	end
 
-	# Loops through the diagionals of the board.
+	# Loops through the 2 diagionals of the board.
 	#
 	# ==== Arguments
 	#
@@ -137,25 +121,40 @@ class Board
 	#
 	# * +Player+ - Returns nil, unless a player occupies an entire diagonal, then returns that player.
 	def scan_diag(proc)
-		has_winner = true
-		winner = proc.call(0)
-		1.upto(@dimension - 1) do |q|
-			index = q * @dimension + q
-			has_winner = false unless winner == proc.call(index)
-		end
-		return winner if has_winner && winner != nil
+		top_left_to_bottom_right = Proc.new { |p| 0}
+		result = scan_helper(proc, top_left_to_bottom_right) { |p, q| q * @dimension + q }
+		return result if result
 
-		has_winner = true
-		winner = proc.call(6)
-		@dimension - 2.downto(0) do |q|
-			index = @dimension * (q + 1) - 1 - q
-			has_winner = false unless winner == proc.call(index)
-		end
-		return winner if has_winner && winner != nil
+		bottom_left_to_top_right = Proc.new { |p| 6}
+		res = scan_helper(proc, bottom_left_to_top_right) { |p, q| @dimension * (@dimension - q - 1) + q }
+	end
+
+	# Helper method for the scan methods.
+	# Loops Through a rows, columns or a diagional and returns nil
+	# unless a player occupies all spaces in said row, column or diagonal.
+	#
+	# ==== Arguments
+	#
+	# * +proc1+ - Calculation for first indexes of rows, columns or a diagonal.
+	# * +proc2+ - Calculation for !first indexes of row, column or diagonal.
+	#
+	# ==== Returns
+	#
+	# * +Player+ - Returns nil, unless a player occupies an entire diagonal, then returns that player.
+	def scan_helper(proc, proc2)
+		dim_loop { |p|
+			has_winner = true
+			winner = proc.call(proc2.call(p))
+			1.upto(@dimension - 1) do |q|
+				index = yield(p, q)
+				has_winner = false unless winner == proc.call(index)
+			end
+			return winner if has_winner && winner != nil
+		}
 		nil
 	end
 
-	# Loops from 0 to @dimension - 1 and yields to a given block within
+	# Loops from 0 to @dimension - 1 and yields to a given block
 	def dim_loop
 		@dimension.times do |d|
 			yield(d)

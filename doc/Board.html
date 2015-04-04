@@ -72,7 +72,11 @@
     
     <li ><a href="#method-c-new">::new</a>
     
+    <li ><a href="#method-i-move">#move</a>
+    
     <li ><a href="#method-i-status">#status</a>
+    
+    <li ><a href="#method-i-winner">#winner</a>
     
   </ul>
 </div>
@@ -137,11 +141,10 @@ determine if a player has won.</p>
           <div class="method-source-code" id="new-source">
             <pre><span class="ruby-comment"># File Board.rb, line 10</span>
 <span class="ruby-keyword">def</span> <span class="ruby-identifier">initialize</span>(<span class="ruby-identifier">dimension</span> = <span class="ruby-value">3</span>)
+        <span class="ruby-ivar">@dimension</span> = <span class="ruby-identifier">dimension</span>
         <span class="ruby-ivar">@board</span> = []
-        <span class="ruby-value">3</span>.<span class="ruby-identifier">times</span> <span class="ruby-keyword">do</span>
-                <span class="ruby-value">3</span>.<span class="ruby-identifier">times</span> <span class="ruby-keyword">do</span>
-                        <span class="ruby-ivar">@board</span>.<span class="ruby-identifier">push</span>(<span class="ruby-value">0</span>)
-                <span class="ruby-keyword">end</span>
+        (<span class="ruby-identifier">dimension</span><span class="ruby-operator">**</span><span class="ruby-value">2</span>).<span class="ruby-identifier">times</span> <span class="ruby-keyword">do</span>
+                <span class="ruby-ivar">@board</span>.<span class="ruby-identifier">push</span>(<span class="ruby-keyword">nil</span>)
         <span class="ruby-keyword">end</span>
 <span class="ruby-keyword">end</span></pre>
           </div>
@@ -160,6 +163,52 @@ determine if a player has won.</p>
        <header>
          <h3>Public Instance Methods</h3>
        </header>
+
+    
+      <div id="method-i-move" class="method-detail ">
+        
+        <div class="method-heading">
+          <span class="method-name">move</span><span
+            class="method-args">(index, player)</span>
+          
+          <span class="method-click-advice">click to toggle source</span>
+          
+        </div>
+        
+
+        <div class="method-description">
+          
+          <p>Execute a move on the board.</p>
+
+<h4 id="method-i-move-label-Arguments">Arguments<span><a href="#method-i-move-label-Arguments">&para;</a> <a href="#top">&uarr;</a></span></h4>
+<ul><li>
+<p><code>index</code> - 0 &lt;= index &lt;= dimension**2</p>
+</li><li>
+<p><code>player</code> - The player who is making the move</p>
+</li></ul>
+
+<h4 id="method-i-move-label-Returns">Returns<span><a href="#method-i-move-label-Returns">&para;</a> <a href="#top">&uarr;</a></span></h4>
+<ul><li>
+<p><code>Boolean</code> - True if the move was succesfully executed, false if
+it is invalid.</p>
+</li></ul>
+          
+          
+
+          
+          <div class="method-source-code" id="move-source">
+            <pre><span class="ruby-comment"># File Board.rb, line 42</span>
+<span class="ruby-keyword">def</span> <span class="ruby-identifier">move</span>(<span class="ruby-identifier">index</span>, <span class="ruby-identifier">player</span>)
+        <span class="ruby-identifier">empty</span>(<span class="ruby-identifier">index</span> <span class="ruby-operator">-</span> <span class="ruby-value">1</span>) <span class="ruby-operator">?</span> <span class="ruby-identifier">set</span>(<span class="ruby-identifier">index</span> <span class="ruby-operator">-</span> <span class="ruby-value">1</span>, <span class="ruby-identifier">player</span>) <span class="ruby-operator">:</span> <span class="ruby-keyword">false</span>
+<span class="ruby-keyword">end</span></pre>
+          </div>
+          
+        </div>
+
+        
+
+        
+      </div>
 
     
       <div id="method-i-status" class="method-detail ">
@@ -183,19 +232,58 @@ determine if a player has won.</p>
 
           
           <div class="method-source-code" id="status-source">
-            <pre><span class="ruby-comment"># File Board.rb, line 22</span>
+            <pre><span class="ruby-comment"># File Board.rb, line 21</span>
 <span class="ruby-keyword">def</span> <span class="ruby-identifier">status</span>
-        <span class="ruby-identifier">dimension</span> = <span class="ruby-constant">Math</span>.<span class="ruby-identifier">sqrt</span>(<span class="ruby-ivar">@board</span>.<span class="ruby-identifier">length</span>).<span class="ruby-identifier">to_i</span>
-
-        <span class="ruby-identifier">dimension</span>.<span class="ruby-identifier">times</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">p</span><span class="ruby-operator">|</span>
+        <span class="ruby-identifier">dim_loop</span>() { <span class="ruby-operator">|</span><span class="ruby-identifier">p</span><span class="ruby-operator">|</span>
                 <span class="ruby-identifier">print</span> <span class="ruby-string">&quot;\n&quot;</span>
-                <span class="ruby-identifier">dimension</span>.<span class="ruby-identifier">times</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">q</span><span class="ruby-operator">|</span>
-                        <span class="ruby-identifier">index</span> = <span class="ruby-identifier">p</span> <span class="ruby-operator">*</span> <span class="ruby-identifier">dimension</span> <span class="ruby-operator">+</span> <span class="ruby-identifier">q</span>
-                        <span class="ruby-identifier">print</span> <span class="ruby-ivar">@board</span>[<span class="ruby-identifier">index</span>] <span class="ruby-operator">==</span> <span class="ruby-value">0</span> <span class="ruby-operator">?</span> <span class="ruby-node">&quot;#{ index + 1 } &quot;</span> <span class="ruby-operator">:</span> <span class="ruby-string">&quot;YOLO&quot;</span>
-                <span class="ruby-keyword">end</span>
-        <span class="ruby-keyword">end</span>
+          <span class="ruby-identifier">dim_loop</span> { <span class="ruby-operator">|</span><span class="ruby-identifier">q</span><span class="ruby-operator">|</span>
+                        <span class="ruby-identifier">index</span> = <span class="ruby-identifier">p</span> <span class="ruby-operator">*</span> <span class="ruby-ivar">@dimension</span> <span class="ruby-operator">+</span> <span class="ruby-identifier">q</span>
+                        <span class="ruby-identifier">print</span> <span class="ruby-ivar">@board</span>[<span class="ruby-identifier">index</span>] <span class="ruby-operator">==</span> <span class="ruby-keyword">nil</span> <span class="ruby-operator">?</span> <span class="ruby-node">&quot;#{ index + 1 } &quot;</span> <span class="ruby-operator">:</span> <span class="ruby-node">&quot;#{ @board[index].icon } &quot;</span>
+                }
+        }
+        <span class="ruby-value">2</span>.<span class="ruby-identifier">times</span> { <span class="ruby-identifier">print</span> <span class="ruby-string">&quot;\n&quot;</span> }
+<span class="ruby-keyword">end</span></pre>
+          </div>
+          
+        </div>
 
-        <span class="ruby-identifier">print</span> <span class="ruby-string">&quot;\n&quot;</span>
+        
+
+        
+      </div>
+
+    
+      <div id="method-i-winner" class="method-detail ">
+        
+        <div class="method-heading">
+          <span class="method-name">winner</span><span
+            class="method-args">()</span>
+          
+          <span class="method-click-advice">click to toggle source</span>
+          
+        </div>
+        
+
+        <div class="method-description">
+          
+          <p>Finds a winner if there is one.</p>
+
+<h4 id="method-i-winner-label-Returns">Returns<span><a href="#method-i-winner-label-Returns">&para;</a> <a href="#top">&uarr;</a></span></h4>
+<ul><li>
+<p><code>Player</code> - Returns the winning player or nil if there is no
+winner yet.</p>
+</li></ul>
+          
+          
+
+          
+          <div class="method-source-code" id="winner-source">
+            <pre><span class="ruby-comment"># File Board.rb, line 51</span>
+<span class="ruby-keyword">def</span> <span class="ruby-identifier">winner</span>
+        <span class="ruby-identifier">p1</span> = <span class="ruby-constant">Proc</span>.<span class="ruby-identifier">new</span> { <span class="ruby-operator">|</span><span class="ruby-identifier">index</span><span class="ruby-operator">|</span>  <span class="ruby-ivar">@board</span>[<span class="ruby-identifier">index</span>]}
+        <span class="ruby-keyword">return</span> <span class="ruby-identifier">scan_hor</span>(<span class="ruby-identifier">p1</span>) <span class="ruby-keyword">if</span> <span class="ruby-identifier">scan_hor</span>(<span class="ruby-identifier">p1</span>)
+        <span class="ruby-keyword">return</span> <span class="ruby-identifier">scan_ver</span>(<span class="ruby-identifier">p1</span>) <span class="ruby-keyword">if</span> <span class="ruby-identifier">scan_ver</span>(<span class="ruby-identifier">p1</span>)
+        <span class="ruby-keyword">return</span> <span class="ruby-identifier">scan_diag</span>(<span class="ruby-identifier">p1</span>) <span class="ruby-keyword">if</span> <span class="ruby-identifier">scan_diag</span>(<span class="ruby-identifier">p1</span>)
 <span class="ruby-keyword">end</span></pre>
           </div>
           
